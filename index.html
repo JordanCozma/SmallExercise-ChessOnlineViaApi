@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmallExercise_ChessOnlineViaApi_Menu</title>
+
+    <!-- ! Linked -->
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+
+</head>
+<body>
+    <div class="PageArea">
+
+    
+        <div class="TitleArea">
+            <h3>online functionality via api <br> (deckofcardsapi.com)</h3>
+            <h1>Chess Online</h1>
+            <h3>Created by Jordan Cozma <br> v0.1</h3>
+        </div>
+        
+    
+    
+        <div class="InteractiveArea" >
+            <!--  Different States of the page to toggle between -->
+
+            <div id="default_InteractiveArea">
+                
+                <h2 class="Button" id="newGameButton"> Generate New Game </h2>
+                <h2 class="Button" id="findGameButton"> Link to a Game </h2>
+                <h2 class="Button" id="playOfflineButton"> Play Offline </h2>
+            </div>
+
+
+            <div id="newGame_InteractiveArea">
+                <h2 class="LableNote"> New Game ID </h2>
+                <h2 class="Button RainbowBorder" id="newGameIdValue"> -id- </h2>
+                <h2 class="SubtleTextNote"> waiting for other player </h2>
+                <h2 class="Button backButton" id="backB"> Back </h2>
+
+            </div>
+
+            <div id="findGame_InteractiveArea">
+                <input class="RainbowBorder" type="text" id="idInput" placeholder="Enter Game Id">                
+                <h2 class="Button" onclick="TryLinkGameId()"> Search </h2>
+                <h2 class="SubtleTextNote"> ( ask other player ) </h2>
+                <h2 class="Button backButton" id="backB"> Back </h2>
+                
+            </div>
+
+
+            <div class="BottomOfPageNote">
+                <h2 class="Button" id="joinOldGame"> OldGame </h2>
+                <p id="previous_id"> Previous id: </p>
+                <p> ( game id closes after 2 weeks of inactivity )</p>
+            </div>
+            
+
+
+        </div>
+
+
+
+
+    </div>
+</body>
+</html>

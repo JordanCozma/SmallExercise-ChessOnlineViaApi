@@ -1,0 +1,263 @@
+@font-face {                            /* custom font */
+    font-family: 'CustomFont_';
+    src: url('CaveatBrush-Regular.ttf'); 
+}
+
+
+/*! ------ Quick Styling ------ */
+body{
+    font-family: CustomFont_;
+
+    margin: 0%;
+    border: 0%;
+    padding: 0%;
+
+
+}
+.PageArea{      /* for more control */
+    display: grid;
+    /* flex-direction: column; */
+    /* align-items: center; */
+    grid-template-rows: auto 1fr;
+
+    height: 100vh;
+    width: 100vw;
+    /* background-color:blanchedalmond; */
+
+    margin: 0%;
+    border: 0%;
+    padding: 0%;
+}
+
+.TitleArea{
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 1fr;
+    padding: 1vh 1vw;
+    background-color:blanchedalmond;
+    font-size: 1vw;
+}
+h1, h3{
+    text-align: center;
+    margin: 0;
+    padding: 0%;
+    font-size: 300% ;
+}
+h3{
+    font-size: 1em ;
+}
+.TitleArea h3{
+    text-align: end;
+}
+.TitleArea > *:first-child{
+    text-align: start;
+}
+
+
+
+.InteractiveArea{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    padding-top: 8vh;
+    align-items: center;
+    background-color:darksalmon;
+    /* margin: 1vmin; */
+}
+.Button, .SubtleTextNote{
+    padding: 1em;
+    margin: .8em;
+    background-color:antiquewhite;
+
+    border-radius: 3em;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+h2{
+    text-align: center;
+}
+.SubtleTextNote{
+    /* padding: .2em; */
+    background-color: transparent;
+    font-size: smaller;
+}
+
+
+
+.backButton{    /* want it to act as a small bonus button*/
+    /* position: sticky; */
+
+    font-size: 1.4em;
+    width: 30%;
+    justify-self: center;
+
+    margin-top: 10vh;
+    bottom: 4vh;
+}
+input{
+    font-family: CustomFont_;
+    display: flex;
+    justify-self: center;
+    justify-content: center;
+    font-size: 1.8em;
+    /* width: 50vw; */
+    height: 1em;
+    text-align: center;
+
+    background-color: antiquewhite;
+    
+    padding: 1em;
+    margin: .8em;
+}
+.RainbowBorder{
+    /* rainbow border */
+    border: 5px solid transparent;
+    background-image: linear-gradient(antiquewhite, antiquewhite),
+                      linear-gradient(-150deg, red, orange, yellow, green, blue, indigo, violet);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+
+    font-size: 2em;
+    padding: .6em 1.5em;
+}
+#idInput{
+    border: 4px solid transparent;
+
+}
+
+
+#playOfflineButton{
+    font-size: 1em;
+    width: 30%;
+    justify-self: center;
+}
+.BottomOfPageNote{
+    position: fixed;
+    bottom: 1px;
+    margin: 1px;
+    color: rgba(43, 40, 35, 0.514);
+}
+.BottomOfPageNote > p {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-style: italic;
+
+    white-space: pre;
+}
+
+#joinOldGame{
+    /* position: relative; */
+    /* bottom: 3vh; */
+    /* left: 8vw; */
+    display: flex;
+    justify-self: end;
+    justify-content: center;
+    transform: rotate(6deg);
+
+    width: 3.5em;
+    
+    margin: 0;
+    padding: 0.2em;
+    font-size: 1em;
+}
+
+
+
+
+
+
+/*!  ------ ChessBoardPage ------ */
+
+.ChessArea{
+    background-color:darksalmon;
+}
+.ChessArea{
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: center;
+    /* padding-top: 8vh; */
+    /* align-items: center; */
+    /* background-color:darksalmon; */
+    padding: 2vmin;
+
+    /* height: 100%;         ! check later */
+
+}
+
+.Table{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 80vmin;
+    height: 80vmin;
+}
+.TableLine{
+    display: grid;
+    /* grid-template-columns:  1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr ; */
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+    
+    
+
+    width: 100%;
+    height: 8%;
+
+    padding: 0%;
+    border: 0%;
+    margin: 0%;
+
+    background-color:teal;
+
+    justify-self: center;
+}
+.TableLine > div{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0%;    
+    margin: 0%;
+}
+.TableLine > div > img{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    margin: 0%;
+}
+.Table > div > div {
+    background-color:azure;
+}
+.Table > :nth-child(odd) > :nth-child(odd){
+    background-color: antiquewhite;
+}
+.Table > :nth-child(even) > :nth-child(even){
+    background-color: antiquewhite;
+}
+
+
+
+/** Hovering */
+.TableLine div {
+    cursor: pointer;
+    box-shadow: none; /* No box-shadow initially */
+
+    position: relative;     /*  allows z-index  */
+    transition: box-shadow 0.1s, z-index 0s;  /* Smooth transition */
+
+}
+/* Hover effect */
+.TableLine > div:hover {
+    box-shadow: inset  0 0 0 2px #c9b7c034; /* Creates a border-like effect with a light shadow */
+    z-index: 10;                    
+}
+/* Active (click) effect */
+.TableLine > div:active {
+    box-shadow: inset  0 0 0 2px #b98ba246; /* Darker shadow when active */
+}
+
+
+
+.PlaceHolders > img{
+    display: none;
+}
