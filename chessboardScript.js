@@ -40,6 +40,9 @@ let gridTable;
 const table_ = document.getElementById("table");
 let gridsize_Setup;
 
+let turnturn = 1;
+let turnturn_Text = document.getElementById("TeamNote");
+
 
 //todo offline atm
 //!  ------ ChessPage ------
@@ -134,8 +137,25 @@ function UpdateMatchTable() {
 
         }
     }
-}
 
+    MatchTurnText();
+}
+function MatchTurnText() {
+    switch (turnturn) {
+        case 1:
+            turnturn_Text.textContent = "White's turn";
+            break;
+        case 0:
+            turnturn_Text.textContent = " ";
+            break;
+        case -1:
+            turnturn_Text.textContent = "White's turn";
+            break;
+    
+        default:
+            break;
+    }
+}
 
 
 
@@ -191,7 +211,7 @@ function PutPiece(x, y, img_, isSidePiece = false) {
 
     }
 
-    console.log(img_);
+    // console.log(img_);
     gridTable[y][x] = img_;
 
     UpdateMatchTable();
@@ -202,7 +222,7 @@ function MovePiece(x1, y1, x2, y2, img_ = blankSrc) {
     gridTable[y2][x2] = gridTable[y1][x1];
     gridTable[y1][x1] = img_;
 
-    console.log(img_ + "3");
+    // console.log(img_ + "3");
 
     UpdateMatchTable();
 
@@ -245,7 +265,7 @@ function SideBoardItemClicked(item__) {
 }
 function Selected(x, y, item_, replaceWhenMoved = true){
 
-    console.log(item_)
+    // console.log(item_)
 
 
     // on first select of sidepiece, wipe then do it
@@ -266,13 +286,14 @@ function Selected(x, y, item_, replaceWhenMoved = true){
 
                 selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #c9b7c034");
                 selected = [-1,-1, null, true];
-                // console.log(selected);
+
             }
             else{
                 PutPiece(x, y, selected[2], true);
                 console.log("put" + selected[2]);
             }
 
+            // console.log("Selection Complete");
 
             
         }
@@ -283,7 +304,7 @@ function Selected(x, y, item_, replaceWhenMoved = true){
             // console.log(selected);
         }
         
-        console.log(selected[2]  + "  " + item_)
+        // console.log(selected[2]  + "  " + item_)
 
         
     }

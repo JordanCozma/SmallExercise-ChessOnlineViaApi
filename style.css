@@ -24,6 +24,9 @@ body{
     padding: 0%;
 
 
+    background-color:darksalmon;
+
+
 }
 .PageArea{      /* for more control */
     display: grid;
@@ -31,7 +34,7 @@ body{
     /* align-items: center; */
     grid-template-rows: auto 1fr;
 
-    height: 100vh;
+    height: 95vh;
     width: 100vw;
     /* background-color:blanchedalmond; */
 
@@ -46,6 +49,8 @@ body{
     padding: 1vh 1vw;
     background-color:blanchedalmond;
     font-size: 1vw;
+
+    
 }
 h1, h3{
     text-align: center;
@@ -181,6 +186,9 @@ input{
 
 .ChessArea{
     background-color:darksalmon;
+    margin: 0%;
+    padding: 0%;
+
 }
 .ChessArea{
     display: flex;
@@ -191,6 +199,8 @@ input{
     /* align-items: center; */
     /* background-color:darksalmon; */
     padding: 2vmin;
+    padding-bottom: 0;
+    margin-bottom: 0;
 
     /* height: 100%;         ! check later */
 
@@ -204,6 +214,7 @@ input{
 
     width: 80vmin;
     height: 80vmin;
+
 }
 .TableLine{
     display: grid;
@@ -348,4 +359,33 @@ input{
 
 #sideBoardP{
     background-color: rgba(0, 0, 0, 0);
+}
+
+
+
+
+h4{
+    display: flex;
+    text-align: center;
+    justify-self: center;
+
+    margin:  0;;
+}
+
+
+
+
+
+
+@media screen and (max-aspect-ratio: 1/.8) {
+    .Table{
+        height: 60vh;
+        width: 60vh;
+    }
+}
+@media screen and (max-aspect-ratio: 1/1.1) {
+    .Table{
+        height: 40vh;
+        width: 40vh;
+    }
 }
