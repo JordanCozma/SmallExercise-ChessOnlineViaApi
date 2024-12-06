@@ -32,16 +32,20 @@ const Duck =  document.getElementById("Duck").src;
 const Ladybug =  document.getElementById("Ladybug").src;
 const Stone =  document.getElementById("Stone").src;
 
+const useRulesButton = document.getElementById('RulesButton');
 
 
+let borderSize_ = 0.3;
+let useRules = true;
 
-
-let gridTable;
+let gridTable;      // actual data table to reference and change
 const table_ = document.getElementById("table");
 let gridsize_Setup;
 
 let turnturn = 1;
 let turnturn_Text = document.getElementById("TeamNote");
+
+
 
 
 //todo offline atm
@@ -56,6 +60,14 @@ GenerateChessLayout();
 // PutPiece(2, 4, SquareEg);
 
 SetUpSideBoard();
+
+
+useRulesButton.addEventListener('click', (event) => {
+    useRules = !useRules;
+    UpdateUseRulesButton(useRules);
+});
+UpdateUseRulesButton(useRules);
+
 
 
 //!  ------ Grid SetUp ------
@@ -263,13 +275,18 @@ function TableItemClicked(x,y, item_){
 function SideBoardItemClicked(item__) {
     Selected(-10,-10, item__, false);
 }
+
 function Selected(x, y, item_, replaceWhenMoved = true){
+    //old x y
 
     // console.log(item_)
-
+    
 
     // on first select of sidepiece, wipe then do it
     if (x === -10 & selected[2] != null & selected[2] != item_) {
+
+        UpdatePossibleMoves();
+
         selected[2].style.removeProperty("box-shadow");
         // selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #c9b7c034");
         selected = [-1,-1, null, true];
@@ -278,19 +295,36 @@ function Selected(x, y, item_, replaceWhenMoved = true){
     // something already selected
     if (selected[2] != null) {
 
-        //if not the same
+        //..if not the same
         if (selected[2] != item_) {
 
-            if (selected[3]) {
+            if (selected[3]) {  //if there is a piece to place when moved (not a sidepiece place item)
+                
+                if (useRules) {
+                    // if (IsMoveValid(GetPiece(selected[2]), selected[0], selected[1], x, y, GetPieceColour(selected[2])) == false) {
+                    if (!IsMoveValid2(x, y)) {
+                        console.log("move not within piece rules");
+                        return;
+                    }
+                }
+
+
+
                 MovePiece(selected[0],selected[1], x, y );
 
-                selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #c9b7c034");
+                selected[2].style.setProperty("box-shadow", "inset  0 0 0 .5vmin #c9b7c034");
                 selected = [-1,-1, null, true];
 
+                UpdatePossibleMoves();
+
+
             }
-            else{
+            else{   //new piece
                 PutPiece(x, y, selected[2], true);
                 console.log("put" + selected[2]);
+
+                UpdatePossibleMoves();
+
             }
 
             // console.log("Selection Complete");
@@ -302,6 +336,9 @@ function Selected(x, y, item_, replaceWhenMoved = true){
             // selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #c9b7c034");
             selected = [-1,-1, null, true];
             // console.log(selected);
+
+            UpdatePossibleMoves();
+
         }
         
         // console.log(selected[2]  + "  " + item_)
@@ -310,18 +347,23 @@ function Selected(x, y, item_, replaceWhenMoved = true){
     }
     else{
         
+        UpdatePossibleMoves();
+        
 
         selected = [x, y, item_, replaceWhenMoved];
 
         if (x != -10) {
-            selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #d63478b6");            
+            selected[2].style.setProperty("box-shadow", "inset  0 0 0 .5vmin #d63478b6");            
             // selected[2].style.setProperty("box-shadow", "inset  0 0 0 6px #cf1b7291");            
         }
         else{
-            selected[2].style.setProperty("box-shadow", "inset  0 0 0 30px #d63478b6, 0 0 0 6px #d63478b6"); 
+            selected[2].style.setProperty("box-shadow", "inset  0 0 0 .5vmin #d63478b6, 0 0 0 6px #d63478b6"); 
         }
         
-        
+        if (useRules) {
+            UpdatePossibleMoves(GetPiece(item_), x, y, GetPieceColour(selected[2]));
+        }
+
     }
 
     
@@ -342,4 +384,294 @@ function SetUpSideBoard() {
     
             
     }
+}
+
+
+function UpdateUseRulesButton(useRules_){
+    if (useRules_) {
+        useRulesButton.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+    }
+    else{
+        useRulesButton.style.backgroundColor = "rgba(182, 107, 81, 0)";
+    }
+}
+
+function GetPiece(pieceimg_) {
+    pieceimg_ = pieceimg_.children[0].currentSrc
+    pieceimg_ = pieceimg_.split("_");
+    l = pieceimg_.length
+    // console.log(pieceimg_[l-3]);
+
+    return (pieceimg_[l-3]);
+}
+function GetPieceColour(pieceimg_) {
+    pieceimg_ = pieceimg_.children[0].currentSrc
+    pieceimg_ = pieceimg_.split("_");
+    l = pieceimg_.length
+    // console.log(pieceimg_[l-2]);
+
+    return (pieceimg_[l-2]);
+}
+
+function IsMoveValid(piecetype, x, y, xx, yy, colour_) {
+    // x y = current, xx yy target position
+
+    pieceMoveValid_ = false;
+    
+
+
+    switch (piecetype) {
+        case "knight":
+            if (((Math.abs(x - xx) == 1) & (Math.abs(y - yy) == 2)) || ((Math.abs(x - xx) == 2) & (Math.abs(y - yy) == 1)))  {
+                pieceMoveValid_ = true;
+            }
+            break;
+
+        case "rook":
+            if (((x != xx) & (y == yy)) || ((x == xx) & (y != yy)))  {
+                pieceMoveValid_ = true;
+            }
+            break;
+
+        case "bishop":
+            if (Math.abs(x - xx) == Math.abs(y - yy))  {
+                pieceMoveValid_ = true;
+            }
+            break;
+
+        case "king":
+            if ((Math.abs(x - xx) <= 1) & (Math.abs(y - yy) <= 1))  {
+                pieceMoveValid_ = true;
+            }
+            break;
+
+        case "queen":     //just put bishop and knights rules here
+            if (((x != xx) & (y == yy)) || ((x == xx) & (y != yy)))  {
+                pieceMoveValid_ = true;
+            }
+            if (Math.abs(x - xx) == Math.abs(y - yy))  {
+                pieceMoveValid_ = true;
+            }
+            break;
+
+        case "pawn":
+            if (colour_) {
+                if ((Math.abs(x - xx) == 0) & (yy - y > 0))  {
+                    pieceMoveValid_ = true;
+                }
+                if ((Math.abs(x - xx) == 1) & (yy - y == 1) )  {    //
+                    pieceMoveValid_ = true;
+                    console.log(gridTable[xx, yy]);
+                }
+                console.log(colour_ + "  pawnpiece");
+
+            }
+            
+            break;
+
+
+        default:
+            console.log("piece not found in system " + piecetype);
+            break;
+    }
+
+
+}
+
+function UpdatePossibleMoves(piecetype = "none", x = -50, y = -50, colour = "none") {
+    if (piecetype != "none") {
+        
+
+        for (let yyy = 0; yyy < gridTable.length; yyy++) {
+            for (let xxx = 0; xxx < gridTable[0].length; xxx++) {
+                
+                switch (piecetype) {
+                    case "knight":      //check if piece can move there
+                        if (((Math.abs(x - xxx) == 1) & (Math.abs(y - yyy) == 2)) || ((Math.abs(x - xxx) == 2) & (Math.abs(y - yyy) == 1))) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    case "rook":      //check if piece can move there
+                        if (((x != xxx) & (y == yyy)) || ((x == xxx) & (y != yyy))) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    case "bishop":      //check if piece can move there
+                        if (Math.abs(x - xxx) == Math.abs(y - yyy)) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    case "king":      //check if piece can move there
+                        if ((Math.abs(x - xxx) <= 1) & (Math.abs(y - yyy) <= 1)) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    case "queen":      //check if piece can move there
+                        if (((x != xxx) & (y == yyy)) || ((x == xxx) & (y != yyy))) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        if (Math.abs(x - xxx) == Math.abs(y - yyy)) {
+                            //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    case "pawn":   
+                    
+                    if (colour == "w") {
+                        //check if piece can move there
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == 1 || yyy - y == 2)) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        console.log(GetPieceColour(table_.children[yyy].children[xxx]));
+                        if ((Math.abs(x - xxx) == 1) & (yyy - y == 1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "w" & colour == "b"))||(GetPieceColour(table_.children[yyy].children[xxx]) == "b" & colour == "w"))) {
+                            //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    }
+                    else{
+                        //check if piece can move there
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == -1 || yyy - y == -2)) {
+                                //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        console.log(GetPieceColour(table_.children[yyy].children[xxx]));
+                        if ((Math.abs(x - xxx) == -1) & (yyy - y == -1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "w" & colour == "b"))||(GetPieceColour(table_.children[yyy].children[xxx]) == "b" & colour == "w"))) {
+                            //check if own colour is on it - if its 
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        break;
+                    }
+                    
+                    
+                    
+                        
+
+                
+                    default:
+                        break;
+                }
+                
+                
+            }                                
+        }   
+
+
+
+        
+    }
+    else{
+        for (let yyy = 0; yyy < gridTable.length; yyy++) {
+            for (let xxx = 0; xxx < gridTable[0].length; xxx++) {
+
+                ColourTile(table_.children[yyy].children[xxx], "clear");
+
+            }
+        }
+    }
+
+
+
+}
+
+function DoOwnColourCheck(xxx, yyy, colour) {
+    c = GetPieceColour(table_.children[yyy].children[xxx]);
+                            if (((c != colour) & c == "w") || ((c != colour) & c == "b") || ((c == "p"))) {
+                                ColourTile(table_.children[yyy].children[xxx], "movable");
+                            }
+                            else{
+                                ColourTile(table_.children[yyy].children[xxx], "almostMovable");
+                            }
+}
+
+
+
+function ColourTile(tile, colourlable) {
+    c = "red";
+    switch (colourlable) {
+        case "movable":
+            c = "#eb96c0";
+            break;
+        case "almostMovable":
+            c = "#dab1c5";
+            break;
+        case "clear":
+            c = "#c9b7c034";
+            break;
+    
+        default:
+            break;
+    }
+
+    tile.style.setProperty("box-shadow", "inset  0 0 0 .5vmin " + c);
+}
+
+
+function IsMoveValid2(x, y) {
+    // getBoxShadowColor(table_.children[yyy].children[xxx]);
+    if ((getBoxShadowHexColor(table_.children[y].children[x])) ==  "#eb96c0" ) {
+        return true;
+    } 
+    return false
+    
+}
+
+//imported from the web
+function getBoxShadowHexColor(element) {
+    if (!element) {
+        console.error("Invalid element provided.");
+        return null;
+    }
+
+    // Get the computed box-shadow property
+    const boxShadow = window.getComputedStyle(element).boxShadow;
+
+    // Check if no box-shadow is applied
+    if (!boxShadow || boxShadow === "none") {
+        console.log("No box-shadow applied.");
+        return null;
+    }
+
+    // Extract the color part (matches rgba(), rgb(), or hex colors)
+    const colorMatch = boxShadow.match(/rgba?\([^)]+\)|#[a-fA-F0-9]{3,8}/);
+    if (!colorMatch) {
+        console.log("No color found in box-shadow.");
+        return null;
+    }
+
+    const color = colorMatch[0];
+
+    // Convert RGB/RGBA to HEX if needed
+    if (color.startsWith("rgb")) {
+        return rgbToHex(color);
+    }
+
+    // Return HEX color if already in HEX format
+    return color.toLowerCase();
+}
+
+// Helper function: Convert RGB(A) to HEX
+function rgbToHex(rgb) {
+    // Extract RGB values
+    const rgbValues = rgb.match(/\d+/g).map(Number);
+    if (!rgbValues || rgbValues.length < 3) {
+        console.error("Invalid RGB color format:", rgb);
+        return null;
+    }
+
+    // Convert RGB to HEX
+    return (
+        "#" +
+        rgbValues
+            .slice(0, 3) // Ignore alpha if present
+            .map(value => value.toString(16).padStart(2, "0"))
+            .join("")
+            .toLowerCase()
+    );
 }
