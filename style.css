@@ -412,3 +412,74 @@ h4{
         width: 40vh;
     }
 }
+
+
+
+.RainbowBorder{
+    user-select: text;           /* Prevent text selection */
+    -webkit-user-drag: text;     /* Prevent dragging in WebKit browsers */
+    -moz-user-select: text;      /* For Firefox */
+    -ms-user-select: text;       /* For Internet Explorer */
+}
+
+#YourColour{
+    position: absolute;
+    right: -0em;
+    top: 12vh;
+
+    background-color: rgba(83, 66, 66, 0.048);
+    padding: .8em;
+    border-radius: 1.4em;
+    width: 2.5em;
+    color: rgba(128, 40, 11, 0.747);
+    /* color: rgba(136, 69, 47, 0.747); */
+}
+#EmergencySearch{
+    position: absolute;
+    left: 6em;
+    bottom: .5vh ;
+
+    font-size: smaller;
+    line-height: .8em;
+    background-color: rgba(83, 66, 66, 0.048);
+    padding: .8em;
+    border-radius: 1.4em;
+    width: 2.5em;
+    color: rgba(128, 40, 11, 0.747);
+    /* color: rgba(136, 69, 47, 0.747); */
+}
+
+#KingDown{
+    position: fixed;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 12vmin;
+    
+    background-color: rgba(83, 66, 66, 0.048);
+    padding: .5em;
+    border-radius: 1.4em;
+    width: 5em;
+    color: rgba(128, 40, 11, 0.747);
+    /* color: rgba(136, 69, 47, 0.747); */
+
+
+
+    border: 5px solid transparent;
+    background-image: linear-gradient(rgb(250, 235, 215), antiquewhite),
+                      linear-gradient(-150deg, red, orange, yellow, green, blue, indigo, violet);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+
+
+
+}
+
+#previous_id{
+    user-select: text;           /* Prevent text selection */
+    -webkit-user-drag: text;     /* Prevent dragging in WebKit browsers */
+    -moz-user-select: text;      /* For Firefox */
+    -ms-user-select: text;       /* For Internet Explorer */
+}

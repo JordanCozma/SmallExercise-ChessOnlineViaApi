@@ -65,15 +65,20 @@ async function MainMenuButtonClicked(buttonid_){
     switch (buttonid_) {
         case newGameButton_:
             await GenerateNewGameId();
+            localStorage.setItem('offlineMode_', false);
+            localStorage.setItem('thisUsersColour_', "white");
             SetHomePageTo(newGamePage);
             UpdateIdOnNewGamePage(GetSavedData("deck_id"));
             PlayerSyncSetUp(1, GetSavedData("deck_id"));
             
             break;
         case findGameButton_:
+            localStorage.setItem('offlineMode_', false);
+            localStorage.setItem('thisUsersColour_', "black");
             SetHomePageTo(findGamePage);
             break;
         case playOfflineButton_:
+            localStorage.setItem('offlineMode_', true);
             window.location.href = "chessboard.html";
              break;
         case "backB":
@@ -175,7 +180,7 @@ async function TryLinkGameId(){
 
 function CheckSetPreciousId(idData_ = GetSavedData("deck_id")){
     if (idData_ != null) {
-        document.getElementById("joinOldGame").style.display = "";
+        document.getElementById("joinOldGame").style.display = "none";  //clear it for now
         document.getElementById("previous_id").style.display = "";
         document.getElementById("previous_id").textContent = `Previous id   ->   ${idData_}`;
     } else{

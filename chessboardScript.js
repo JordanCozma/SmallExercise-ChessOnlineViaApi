@@ -33,6 +33,9 @@ const Ladybug =  document.getElementById("Ladybug").src;
 const Stone =  document.getElementById("Stone").src;
 
 const useRulesButton = document.getElementById('RulesButton');
+const youreColourButton = document.getElementById('YourColour');
+const EmergencySearchButton = document.getElementById('EmergencySearch');
+const KingDownButton = document.getElementById('KingDown');
 
 
 let borderSize_ = 0.3;
@@ -41,6 +44,18 @@ let useRules = true;
 let gridTable;      // actual data table to reference and change
 const table_ = document.getElementById("table");
 let gridsize_Setup;
+
+
+
+let offline__;
+let thisUsersColour;
+let gameId = null;
+const pileName_Main = "MainPile";
+const pileName_White = "WhitePile";
+const pileName_Black = "BlackPile";
+let FindingData = false;
+const delayChecks = 800;
+
 
 let turnturn = 1;
 let turnturn_Text = document.getElementById("TeamNote");
@@ -51,6 +66,12 @@ let turnturn_Text = document.getElementById("TeamNote");
 //todo offline atm
 //!  ------ ChessPage ------
 let gridsize__ = [8, 8];     //grid visually can adapt to any size          -- max 13?
+
+offline__ = localStorage.getItem('offlineMode_');
+thisUsersColour = localStorage.getItem('thisUsersColour_');
+gameId = localStorage.getItem('deck_id');
+
+KingDownButton.style.display = "none";
 
 SetUpGrid()
 SetUpVisuals()
@@ -68,6 +89,41 @@ useRulesButton.addEventListener('click', (event) => {
 });
 UpdateUseRulesButton(useRules);
 
+
+if (thisUsersColour == "black") {
+    WaitingForEntry(pileName_White);
+}
+
+
+youreColourButton.addEventListener('click', (event) => {
+
+    if (thisUsersColour == "white") {   thisUsersColour = "black"      }
+    else if (thisUsersColour == "black") {   thisUsersColour = "white"      }
+    MatchTurnText();
+
+    if (FindingData == true) {
+        FindingData = false
+
+        // if (thisUsersColour == "white") {    WaitingForEntry(pileName_Black);          }
+        // if (thisUsersColour == "black") {    WaitingForEntry(pileName_White);          }
+        
+    }
+
+    console.log("swoppedteam")
+});
+EmergencySearchButton.addEventListener('click', (event) => {
+
+        FindingData = false;
+
+        if (thisUsersColour == "white") {    WaitingForEntry(pileName_Black);          }
+        if (thisUsersColour == "black") {    WaitingForEntry(pileName_White);          }
+    
+    console.log("searching for other teams moves - non" + thisUsersColour)
+});
+KingDownButton.addEventListener('click', (event) => {
+
+    KingDownButton.style.display = "none";
+});
 
 
 //!  ------ Grid SetUp ------
@@ -145,7 +201,21 @@ function UpdateMatchTable() {
     for (let i = 0; i < gridTable.length; i++) {
         for (let u = 0; u < gridTable[0].length; u++) {
         
+            let marked = 0;
+            if (GetPiece(table_.children[i].children[u]) == "king") {
+                marked = 1;   
+                // console.log("king-")     
+            }
+
             table_.children[i].children[u].children[0].src = gridTable[i][u];
+
+            if (marked == 1) {
+                if (GetPiece(table_.children[i].children[u]) != "king") {
+                    KingDownButton.style.display = "block"
+                    console.log("king-down")  
+                }
+            }
+
 
         }
     }
@@ -158,15 +228,15 @@ function MatchTurnText() {
             turnturn_Text.textContent = "White's turn";
             break;
         case 0:
-            turnturn_Text.textContent = " ";
-            break;
-        case -1:
-            turnturn_Text.textContent = "White's turn";
+            turnturn_Text.textContent = "Black's Turn";
             break;
     
         default:
             break;
     }
+
+    youreColourButton.textContent = `team ${thisUsersColour}`;
+
 }
 
 
@@ -182,20 +252,26 @@ function GenerateChessLayout(){
 
 
     for (let i = 0; i < 8; i++) {
-        PutPiece(i, 0, Line0[i]);
-        PutPiece(i, 1, Pawn_W);
+        PutPiece(i, 0, Line0[i], false, true);
+        PutPiece(i, 1, Pawn_W, false, true);
 
-        PutPiece(i, 7, Line7[i]);
-        PutPiece(i, 6, Pawn_B);
+        PutPiece(i, 7, Line7[i], false, true);
+        PutPiece(i, 6, Pawn_B, false, true);
     }
 
 }
 
 
 
-function PutPiece(x, y, img_, isSidePiece = false) {
+function PutPiece(x, y, img_, isSidePiece = false, ignore = false) {
 
+    img_2 = img_;
     if (isSidePiece) {
+
+
+        
+
+
         switch (img_.className) {
             case "Rook_W":      img_ = Rook_W;                  break;
             case "Knight_W":    img_ = Knight_W;                break;
@@ -211,10 +287,10 @@ function PutPiece(x, y, img_, isSidePiece = false) {
             case "King_B":      img_ = King_B;                  break;
             case "Pawn_B":      img_ = Pawn_B;                  break;
 
-            case "Duck":     img_ = Duck;                 break;
-            case "Stone":      img_ = Stone;                  break;
-            case "SquareEg":      img_ = SquareEg;                  break;
-            case "Ladybug":      img_ = Ladybug;                  break;
+            case "Duck":        img_ = Duck;                 break;
+            case "Stone":       img_ = Stone;                  break;
+            case "SquareEg":    img_ = SquareEg;                  break;
+            case "Ladybug":     img_ = Ladybug;                  break;
         
             default:
                 break;
@@ -226,6 +302,10 @@ function PutPiece(x, y, img_, isSidePiece = false) {
     // console.log(img_);
     gridTable[y][x] = img_;
 
+    // console.log( "ignore" + ignore)
+    UpdateTurnTurn(ignore);
+    SendData(100, 100, x, y, img_2, ignore);
+    
     UpdateMatchTable();
 }
 
@@ -236,7 +316,13 @@ function MovePiece(x1, y1, x2, y2, img_ = blankSrc) {
 
     // console.log(img_ + "3");
 
+
+    UpdateTurnTurn();
+    SendData(x1, y1, x2, y2, img_);
+
     UpdateMatchTable();
+
+
 
 }
 
@@ -267,7 +353,9 @@ function TableItemClicked(x,y, item_){
 
     // item_.style.box-shadow = "inset  0 0 0 2px #c9b7c034";
     // item_.style.setProperty("box-shadow", "inset  0 0 0 6px #c9b7c034");
-    console.log(x + " " + y);
+
+    // console.log(x + " " + y);
+
 
     Selected(x,y, item_);
 
@@ -279,8 +367,12 @@ function SideBoardItemClicked(item__) {
 function Selected(x, y, item_, replaceWhenMoved = true){
     //old x y
 
-    // console.log(item_)
-    
+
+    //!  data is in strings 
+    if ((turnturn == "1") & (thisUsersColour == "black") & (offline__ == "false")) {  console.log("not ur turn yet");  return;    }
+    if ((turnturn == "0") & (thisUsersColour == "white") & (offline__ == "false")) {  console.log("not ur turn yet");  return;    }
+
+
 
     // on first select of sidepiece, wipe then do it
     if (x === -10 & selected[2] != null & selected[2] != item_) {
@@ -312,8 +404,10 @@ function Selected(x, y, item_, replaceWhenMoved = true){
 
                 MovePiece(selected[0],selected[1], x, y );
 
+
                 selected[2].style.setProperty("box-shadow", "inset  0 0 0 .5vmin #c9b7c034");
                 selected = [-1,-1, null, true];
+
 
                 UpdatePossibleMoves();
 
@@ -347,8 +441,18 @@ function Selected(x, y, item_, replaceWhenMoved = true){
     }
     else{
         
+
+        // cant select other colours pieces if rules are on
+        if (GetPieceColour(item_) == "w" & thisUsersColour == "black" & useRules == true) {     return;  }
+        if (GetPieceColour(item_) == "b" & thisUsersColour == "white" & useRules == true) {     return;  }
+        // cant select blank pieces
+        if (GetPieceColour(item_) == "p") {     return;  }
+
+
+
         UpdatePossibleMoves();
         
+
 
         selected = [x, y, item_, replaceWhenMoved];
 
@@ -396,24 +500,54 @@ function UpdateUseRulesButton(useRules_){
     }
 }
 
-function GetPiece(pieceimg_) {
-    pieceimg_ = pieceimg_.children[0].currentSrc
-    pieceimg_ = pieceimg_.split("_");
-    l = pieceimg_.length
-    // console.log(pieceimg_[l-3]);
+function GetPiece(pieceimg_, skip__ = "null") {
+    // console.log(pieceimg_);
 
-    return (pieceimg_[l-3]);
+    try {
+        if (skip__ == "null") {
+            pieceimg_ = pieceimg_.children[0]
+        }
+
+        pieceimg_ = pieceimg_.currentSrc
+        pieceimg_ = pieceimg_.split("_");
+        l = pieceimg_.length
+        // console.log(pieceimg_[l-3]);
+    
+        // console.log(pieceimg_[l-3]);
+        return (pieceimg_[l-3]);
+
+
+
+    } catch (error) {
+        return error
+    }
+
+    
 }
-function GetPieceColour(pieceimg_) {
-    pieceimg_ = pieceimg_.children[0].currentSrc
-    pieceimg_ = pieceimg_.split("_");
-    l = pieceimg_.length
-    // console.log(pieceimg_[l-2]);
+function GetPieceColour(pieceimg_, skip__ = null) {
+    try {
+        
+        if (skip__ == null) {
+            pieceimg_ = pieceimg_.children[0]
+        }
 
-    return (pieceimg_[l-2]);
+        pieceimg_ = pieceimg_.currentSrc
+        pieceimg_ = pieceimg_.split("_");
+        l = pieceimg_.length
+        // console.log("got  " + pieceimg_[l-2]);
+    
+        return (pieceimg_[l-2]);
+
+
+        
+    } catch (error) {
+        return error
+    }
+
+    
 }
 
-function IsMoveValid(piecetype, x, y, xx, yy, colour_) {
+function IsMoveValid_old(piecetype, x, y, xx, yy, colour_) {
     // x y = current, xx yy target position
 
     pieceMoveValid_ = false;
@@ -523,13 +657,18 @@ function UpdatePossibleMoves(piecetype = "none", x = -50, y = -50, colour = "non
                     case "pawn":   
                     
                     if (colour == "w") {
+
                         //check if piece can move there
-                        if ((Math.abs(x - xxx) == 0) & (yyy - y == 1 || yyy - y == 2)) {
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == 2) & (y == 1)) {
+                            console.log(y);
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == 1)) {
                                 //check if own colour is on it - if its 
                             DoOwnColourCheck(xxx, yyy, colour);
                         }
-                        console.log(GetPieceColour(table_.children[yyy].children[xxx]));
-                        if ((Math.abs(x - xxx) == 1) & (yyy - y == 1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "w" & colour == "b"))||(GetPieceColour(table_.children[yyy].children[xxx]) == "b" & colour == "w"))) {
+
+                        if ((Math.abs(x - xxx) == 1) & (yyy - y == 1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "b")))) {
                             //check if own colour is on it - if its 
                             DoOwnColourCheck(xxx, yyy, colour);
                         }
@@ -537,12 +676,16 @@ function UpdatePossibleMoves(piecetype = "none", x = -50, y = -50, colour = "non
                     }
                     else{
                         //check if piece can move there
-                        if ((Math.abs(x - xxx) == 0) & (yyy - y == -1 || yyy - y == -2)) {
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == -2) & (y == 6)) {
+                            console.log(y);
+                            DoOwnColourCheck(xxx, yyy, colour);
+                        }
+                        if ((Math.abs(x - xxx) == 0) & (yyy - y == -1)) {
                                 //check if own colour is on it - if its 
                             DoOwnColourCheck(xxx, yyy, colour);
                         }
-                        console.log(GetPieceColour(table_.children[yyy].children[xxx]));
-                        if ((Math.abs(x - xxx) == -1) & (yyy - y == -1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "w" & colour == "b"))||(GetPieceColour(table_.children[yyy].children[xxx]) == "b" & colour == "w"))) {
+
+                        if ((Math.abs(x - xxx) == 1) & (yyy - y == -1) & (((GetPieceColour(table_.children[yyy].children[xxx]) == "w")))) {
                             //check if own colour is on it - if its 
                             DoOwnColourCheck(xxx, yyy, colour);
                         }
@@ -551,10 +694,14 @@ function UpdatePossibleMoves(piecetype = "none", x = -50, y = -50, colour = "non
                     
                     
                     
-                        
-
                 
-                    default:
+                    default: 
+                        console.log(piecetype);
+                        if (piecetype == "blank") {
+                            break;
+                        }
+                        DoOwnColourCheck(xxx, yyy, colour);
+
                         break;
                 }
                 
@@ -582,7 +729,7 @@ function UpdatePossibleMoves(piecetype = "none", x = -50, y = -50, colour = "non
 
 function DoOwnColourCheck(xxx, yyy, colour) {
     c = GetPieceColour(table_.children[yyy].children[xxx]);
-                            if (((c != colour) & c == "w") || ((c != colour) & c == "b") || ((c == "p"))) {
+                            if (((c != colour) & c == "w") || ((c != colour) & c == "b") || ((c == "p")) || ((c == "l") || (c == "r")||(c == "t"))) {
                                 ColourTile(table_.children[yyy].children[xxx], "movable");
                             }
                             else{
@@ -674,4 +821,352 @@ function rgbToHex(rgb) {
             .join("")
             .toLowerCase()
     );
+}
+
+
+async function SendData(x1, y1, x2, y2, img_ = null, startIgnore = false) {
+
+    // console.log("Sending DataStart" + offline__ + startIgnore)
+
+
+    //if offline dont do this
+    if (offline__ == true) { console.log("c offline__"); return; }
+    if (startIgnore == true) {console.log("c startignore");  return; }
+
+
+
+    // making it here assumes its ur go
+
+
+    //for putting piece
+    if (x1 == 100) {
+
+        console.log(img_);
+        num = -1;
+        switch (img_.className) {
+            case "Rook_W":      num = 1;              break;
+            case "Knight_W":    num = 2;              break;
+            case "Bishop_W":    num = 3;              break;
+            case "Queen_W":     num = 4;              break;
+            case "King_W":      num = 5;              break;
+            case "Pawn_W":      num = 6;              break;
+
+            case "Rook_B":      num = 7;              break;
+            case "Knight_B":    num = 8;              break;
+            case "Bishop_B":    num = 9;              break;
+            case "Queen_B":     num = 10;             break;
+            case "King_B":      num = 11;             break;
+            case "Pawn_B":      num = 12;             break;
+
+            case "Duck":        num = 13;             break;
+            case "Stone":       num = 14;             break;
+            case "SquareEg":    num = 15;             break;
+            case "Ladybug":     num = 16;             break;
+        
+            default:
+                break;
+        }
+
+        //! have to be careful will limited codes
+        if (num >= 9) {
+            x1 = 9;
+            num -= 9;
+            y1 = num;
+
+        }
+        else{
+            x1 = 8;
+            y1 = num;
+        }
+        console.log(x1 + "  " + y1);
+
+    }
+    else{
+        //normal
+
+    }
+
+    
+    if (x1 == 0) {  x1 = "K";  }
+    if (y1 == 0) {  y1 = "K";  }
+    if (x2 == 0) {  x2 = "K";  }
+    if (y2 == 0) {  y2 = "K";  }
+
+    if (x1 == 1) {  x1 = "A";  }
+    if (y1 == 1) {  y1 = "A";  }
+    if (x2 == 1) {  x2 = "A";  }
+    if (y2 == 1) {  y2 = "A";  }
+
+    //get values, will be < 8 or so
+    xx1 = x1 + "S";
+    yy1 = y1 + "D";
+    xx2 = x2 + "C";
+    yy2 = y2 + "H";
+
+    
+    //pull cards - for api process
+    d = await GetDataFromApi(`https://deckofcardsapi.com/api/deck/${gameId}/draw/?count=52`);
+
+
+    let pilepile = pileName_White;
+    if (thisUsersColour == "white") {
+        pilepile = pileName_White;
+    }
+    else{
+        pilepile = pileName_Black;        
+    }
+
+    d = await GetDataFromApi(`https://deckofcardsapi.com/api/deck/${gameId}/pile/${pilepile}/add/?cards=${xx1},${yy1},${xx2},${yy2}`);
+    console.log(d);
+
+
+
+
+    if (thisUsersColour == "black") {
+        pilepile = pileName_White;
+    }
+    else{
+        pilepile = pileName_Black;        
+    }
+
+    console.log(`data sent - ${xx1} ${yy1} ${xx2} ${yy2}`)
+    WaitingForEntry(pilepile);
+
+    
+
+
+}
+
+async function WaitingForEntry(pilepile_) {
+
+    console.log(`now waiting for entry in  ${pilepile_}`)
+
+
+    FindingData = true;
+    attemptsWhileLoop = 0;
+    while (FindingData == true & (attemptsWhileLoop < 1000) ) {
+
+
+        console.log(`https://deckofcardsapi.com/api/deck/${gameId}/pile/${pilepile_}/list/`)
+
+
+        // this is checking for other players data
+        d = await GetDataFromApi(`https://deckofcardsapi.com/api/deck/${gameId}/pile/${pilepile_}/list/`);
+        if (d != null) {                      
+            if (pilepile_ == "WhitePile") {
+                c = d?.piles?.WhitePile?.remaining ?? -1;                
+            }
+            else{
+                c = d?.piles?.BlackPile?.remaining ?? -1;    
+            }
+            if (c > 0) {   
+                ReadData(d, pilepile_);
+                break;
+            }
+        }
+
+
+
+        if (FindingData == true & (attemptsWhileLoop < 1000)) {
+            await new Promise(r => setTimeout(r, delayChecks)); // second delay Before trying again
+        }
+
+        if (attemptsWhileLoop >= 1000) {
+            console.log("need button to reset finding system");
+        }
+
+        attemptsWhileLoop++;
+    }
+
+
+
+}
+
+async function GetDataFromApi(url__) {
+    const apiUrl = url__;
+
+    try {
+        const response = await fetch(apiUrl).catch(() => null); // Handle network errors silently
+
+        if (!response.ok) {
+            return null;
+
+            // throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return data;
+
+
+    } catch (error) {
+        // console.error("Fetch Error:", error);
+        return null;
+    }
+    
+
+}
+
+async function ReadData(dd, pile__) {
+
+    
+    if (pile__ == "WhitePile") {     dd =  dd.piles.WhitePile.cards;  }
+    if (pile__ == "BlackPile") {     dd =  dd.piles.BlackPile.cards;  }
+
+    let cards = [];
+    for (let i = 0; i < dd.length; i++) {
+        cards.push(dd[i].code);
+    }
+
+    //is it a place piece?   /  check for codes
+    if (cards.length == 4) {
+        //normal
+
+        //cut off last char of card code
+        for (let i = 0; i < cards.length; i++) {
+            cards[i] = cards[i].substring(0, cards[i].length - 1);
+
+            if (cards[i] == "K") {  cards[i] = "0";  }
+            if (cards[i] == "A") {  cards[i] = "1";  }
+
+        }
+
+
+
+
+        console.log(cards);
+
+
+        if (cards[0] >= 8) {
+            //its a place piece move
+ 
+
+            //! decode
+            let t;         
+            switch (cards[0]) {
+                case "8":
+                    t = cards[1];
+                    break;
+                case "9":
+                    t = parseInt(cards[1]) + 9;
+                    break;
+            
+                default:
+                    console.log(cards[0]);
+                    break;
+            }
+
+            t = t.toString();
+            let iii;
+            switch (t) {
+                case "1":    iii =     Rook_W     ; break;
+                case "2":    iii =     Knight_W   ; break;
+                case "3":    iii =     Bishop_W   ; break;
+                case "4":    iii =     Queen_W    ; break;
+                case "5":    iii =     King_W     ; break;
+                case "6":    iii =     Pawn_W     ; break;
+    
+                case "7":    iii =     Rook_B     ; break;
+                case "8":    iii =     Knight_B   ; break;
+                case "9":    iii =     Bishop_B   ; break;
+                case "10":   iii =     Queen_B    ; break;
+                case "11":   iii =     King_B     ; break;
+                case "12":   iii =     Pawn_B     ; break;
+    
+                case "13":   iii =     Duck       ; break;
+                case "14":   iii =     Stone      ; break;
+                case "15":   iii =     SquareEg   ; break;
+                case "16":   iii =     Ladybug    ; break;
+        
+                default:
+                    iii = "firebroke"
+                    break;
+            }
+
+            console.log(cards);
+            console.log(cards[2] +"- "+ cards[3] +"- "+ iii);
+
+            PutPiece(cards[2], cards[3], iii, false, true);
+
+
+
+            
+
+
+
+        }
+        else{
+            //its a move piece move
+            console.log(cards[0],cards[1],cards[2],cards[3]);
+
+            MovePiece(cards[0],cards[1],cards[2],cards[3])
+        }
+
+
+
+
+        //clear api stuff     
+
+        d = await GetDataFromApi(`https://deckofcardsapi.com/api/deck/${gameId}/pile/${pile__}/draw/?cards=${dd[0].code},${dd[1].code},${dd[2].code},${dd[3].code}`);
+        // Push back into pile
+        d = await GetDataFromApi(`https://deckofcardsapi.com/api/deck/${gameId}/pile/${pileName_Main}/add/?cards=AS,2S,3S,4S,5S,6S,7S,8S,9S,0S,JS,QS,KS,AD,2D,3D,4D,5D,6D,7D,8D,9D,0D,JD,QD,KD,AC,2C,3C,4C,5C,6C,7C,8C,9C,0C,JC,QC,KC,AH,2H,3H,4H,5H,6H,7H,8H,9H,0H,JH,QH,KH`);
+        console.log(d);
+
+    }
+
+
+    console.log(cards);
+
+    UpdateTurnTurn(false, true);
+}
+
+
+function UpdateTurnTurn(ignore = false, toMine = false) {
+    // just did ur go, now toggle turn tracker
+
+    if (ignore == true) {
+        return
+    }
+    
+
+    if (offline__ == "true") {
+        if (turnturn == 1) {
+            turnturn = 0;
+        }
+        else{
+            if (turnturn == 0) {
+                turnturn = 1;
+            }
+        }
+
+
+    }
+    else{
+
+        if (toMine == true) {
+            if (thisUsersColour == "white") {
+                turnturn = 1;
+            }
+            else{
+                turnturn = 0;
+            }
+        }
+        else{
+            if (thisUsersColour == "white") {
+                turnturn = 0;
+            }
+            else{
+                turnturn = 1;
+            }
+        }
+
+
+        
+    }
+
+
+
+    MatchTurnText();
+
+    console.log( "TurnTurn = " + turnturn)
 }
