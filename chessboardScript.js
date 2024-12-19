@@ -94,6 +94,7 @@ if (thisUsersColour == "black") {
     WaitingForEntry(pileName_White);
 }
 
+UpdateButton_FindingData(2000);
 
 youreColourButton.addEventListener('click', (event) => {
 
@@ -263,7 +264,7 @@ function GenerateChessLayout(){
 
 
 
-function PutPiece(x, y, img_, isSidePiece = false, ignore = false) {
+function PutPiece(x, y, img_, isSidePiece = false, ignore = false, skipSendData = false) {
 
     img_2 = img_;
     if (isSidePiece) {
@@ -304,12 +305,15 @@ function PutPiece(x, y, img_, isSidePiece = false, ignore = false) {
 
     // console.log( "ignore" + ignore)
     UpdateTurnTurn(ignore);
-    SendData(100, 100, x, y, img_2, ignore);
+
+    if (skipSendData == false) {
+        SendData(100, 100, x, y, img_2, ignore);
+    }
     
     UpdateMatchTable();
 }
 
-function MovePiece(x1, y1, x2, y2, img_ = blankSrc) {
+function MovePiece(x1, y1, x2, y2, img_ = blankSrc, skipSendData = false) {
 
     gridTable[y2][x2] = gridTable[y1][x1];
     gridTable[y1][x1] = img_;
@@ -318,7 +322,10 @@ function MovePiece(x1, y1, x2, y2, img_ = blankSrc) {
 
 
     UpdateTurnTurn();
-    SendData(x1, y1, x2, y2, img_);
+
+    if (skipSendData == false) {
+        SendData(x1, y1, x2, y2, img_);
+    }
 
     UpdateMatchTable();
 
@@ -963,8 +970,10 @@ async function WaitingForEntry(pilepile_) {
                 c = d?.piles?.BlackPile?.remaining ?? -1;    
             }
             if (c > 0) {   
+                FindingData = false;
                 await ReadData(d, pilepile_);
                 FindingData = false;
+
                 break;
             }
         }
@@ -981,10 +990,24 @@ async function WaitingForEntry(pilepile_) {
 
         attemptsWhileLoop++;
     }
+    FindingData == false;
 
 
 
 }
+
+async function UpdateButton_FindingData(t){
+    while (true) {
+        if (FindingData == true) {
+            EmergencySearchButton.style.backgroundColor = rgba(83, 66, 66, 0);            
+        }
+        else{
+            EmergencySearchButton.style.backgroundColor = rgba(83, 66, 66, 0.048);            
+        }
+        await new Promise(r => setTimeout(r, t));
+    }
+}
+
 
 async function GetDataFromApi(url__) {
     const apiUrl = url__;
@@ -1090,7 +1113,7 @@ async function ReadData(dd, pile__) {
             console.log(cards);
             console.log(cards[2] +"- "+ cards[3] +"- "+ iii);
 
-            PutPiece(cards[2], cards[3], iii, false, true);
+            PutPiece(cards[2], cards[3], iii, false, true, true);
 
 
 
@@ -1103,7 +1126,7 @@ async function ReadData(dd, pile__) {
             //its a move piece move
             console.log(cards[0],cards[1],cards[2],cards[3]);
 
-            MovePiece(cards[0],cards[1],cards[2],cards[3])
+            MovePiece(cards[0],cards[1],cards[2],cards[3], blankSrc, true)
         }
 
 
