@@ -613,6 +613,32 @@ h4{
     color: #00000091;
 }
 
+@media (min-width: 1500px) {
+
+    #NotesTag, #NotesTag{
+        top: 8em;
+        /* color: red; */
+    }
+
+    #NotesPage {
+        /* background-color: lightblue; */
+        left: 20em;
+    }
+}
+
+@media (min-width: 1500px) {
+
+    .TitleArea{
+        font-size: 1.5em;
+    }
+}
+@media (min-height: 800px) {
+
+    .TitleArea{
+        font-size: .8em;
+    }
+}
+
 
 #previous_id{
     user-select: text;           /* Prevent text selection */
