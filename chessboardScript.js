@@ -36,6 +36,7 @@ const useRulesButton = document.getElementById('RulesButton');
 const youreColourButton = document.getElementById('YourColour');
 const EmergencySearchButton = document.getElementById('EmergencySearch');
 const KingDownButton = document.getElementById('KingDown');
+const SkipButton = document.getElementById('SkipButton');
 
 
 let borderSize_ = 0.3;
@@ -63,7 +64,6 @@ let turnturn_Text = document.getElementById("TeamNote");
 
 
 
-//todo offline atm
 //!  ------ ChessPage ------
 let gridsize__ = [8, 8];     //grid visually can adapt to any size          -- max 13?
 
@@ -90,11 +90,31 @@ useRulesButton.addEventListener('click', (event) => {
 UpdateUseRulesButton(useRules);
 
 
-if (thisUsersColour == "black") {
-    WaitingForEntry(pileName_White);
+
+
+
+//if offline turn off uneeded features
+if (offline__ == "true") {
+    EmergencySearchButton.style.display = "none";
+    youreColourButton.style.display = "none";
+    
+}
+else{
+
+
+    if (thisUsersColour == "black") {
+        WaitingForEntry(pileName_White);
+    }
+    
+    UpdateButton_FindingData(2000);
+    
+
+
 }
 
-UpdateButton_FindingData(2000);
+
+
+
 
 youreColourButton.addEventListener('click', (event) => {
 
@@ -125,6 +145,16 @@ KingDownButton.addEventListener('click', (event) => {
 
     KingDownButton.style.display = "none";
 });
+SkipButton.addEventListener('click', (event) => {
+
+    SendData(9,9,9,9);  //skipCode
+    UpdateTurnTurn();
+
+});
+
+
+
+
 
 
 //!  ------ Grid SetUp ------
@@ -227,9 +257,11 @@ function MatchTurnText() {
     switch (turnturn) {
         case 1:
             turnturn_Text.textContent = "White's turn";
+            if (offline__ == "true") {   thisUsersColour = "white";   }
             break;
         case 0:
             turnturn_Text.textContent = "Black's Turn";
+            if (offline__ == "true") {   thisUsersColour = "black";   }
             break;
     
         default:
@@ -237,6 +269,13 @@ function MatchTurnText() {
     }
 
     youreColourButton.textContent = `team ${thisUsersColour}`;
+    if ((thisUsersColour == "white" & turnturn == 1) || (thisUsersColour == "black" & turnturn == 0)) {
+        SkipButton.style.display = "";
+    }
+    else{
+        SkipButton.style.display = "none";
+    }
+
 
 }
 
@@ -306,7 +345,7 @@ function PutPiece(x, y, img_, isSidePiece = false, ignore = false, skipSendData 
     // console.log( "ignore" + ignore)
     UpdateTurnTurn(ignore);
 
-    if (skipSendData == false) {
+    if (skipSendData == false || offline__ == "true") {
         SendData(100, 100, x, y, img_2, ignore);
     }
     
@@ -323,7 +362,7 @@ function MovePiece(x1, y1, x2, y2, img_ = blankSrc, skipSendData = false) {
 
     UpdateTurnTurn();
 
-    if (skipSendData == false) {
+    if (skipSendData == false || offline__ == "true") {
         SendData(x1, y1, x2, y2, img_);
     }
 
@@ -833,11 +872,12 @@ function rgbToHex(rgb) {
 
 async function SendData(x1, y1, x2, y2, img_ = null, startIgnore = false) {
 
+    
     // console.log("Sending DataStart" + offline__ + startIgnore)
 
 
     //if offline dont do this
-    if (offline__ == true) { console.log("c offline__"); return; }
+    if (offline__ == "true") { console.log("c offline__"); return; }
     if (startIgnore == true) {console.log("c startignore");  return; }
 
 
@@ -997,7 +1037,7 @@ async function WaitingForEntry(pilepile_) {
 }
 
 async function UpdateButton_FindingData(t){
-    while (true) {
+    while (1 == 1) {
         if (FindingData == true) {
             EmergencySearchButton.style.backgroundColor = rgba(83, 66, 66, 0);            
         }
@@ -1007,6 +1047,7 @@ async function UpdateButton_FindingData(t){
         await new Promise(r => setTimeout(r, t));
     }
 }
+
 
 
 async function GetDataFromApi(url__) {
@@ -1063,8 +1104,12 @@ async function ReadData(dd, pile__) {
 
         console.log(cards);
 
-
-        if (cards[0] >= 8) {
+        //skip code
+        if (cards[0] == "9" & "9" == cards[1] & "9" == cards[2] & "9" == cards[3]) {
+            UpdateTurnTurn();
+            console.log("read skip");
+        }
+        else if (cards[0] >= 8) {
             //its a place piece move
  
 
@@ -1116,11 +1161,6 @@ async function ReadData(dd, pile__) {
             PutPiece(cards[2], cards[3], iii, false, true, true);
 
 
-
-            
-
-
-
         }
         else{
             //its a move piece move
@@ -1128,6 +1168,8 @@ async function ReadData(dd, pile__) {
 
             MovePiece(cards[0],cards[1],cards[2],cards[3], blankSrc, true)
         }
+
+
 
 
 
@@ -1187,6 +1229,7 @@ function UpdateTurnTurn(ignore = false, toMine = false) {
         }
 
 
+        
         
     }
 

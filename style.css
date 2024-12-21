@@ -449,6 +449,23 @@ h4{
     /* color: rgba(136, 69, 47, 0.747); */
 }
 
+#SkipButton{
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    bottom: .5vh ;
+    
+
+    font-size: smaller;
+    line-height: .8em;
+    background-color: rgba(83, 66, 66, 0.048);
+    padding: .6em;
+    border-radius: 1.4em;
+    width: 2.5em;
+    color: rgba(128, 40, 11, 0.747);
+    /* color: rgba(136, 69, 47, 0.747); */
+}
+
 #KingDown{
     position: fixed;
     position: absolute;
