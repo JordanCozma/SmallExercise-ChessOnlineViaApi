@@ -53,12 +53,27 @@ const findGameButton_ = document.getElementById('findGameButton');
 const playOfflineButton_ = document.getElementById('playOfflineButton');
 const backButtons_ = document.querySelectorAll('.backButton');
 
+
 newGameButton_.addEventListener('click', () => MainMenuButtonClicked(newGameButton_));
 findGameButton_.addEventListener('click', () => MainMenuButtonClicked(findGameButton_));
 playOfflineButton_.addEventListener('click', () => MainMenuButtonClicked(playOfflineButton_));
 backButtons_.forEach(button_ => {
     button_.addEventListener('click', () => MainMenuButtonClicked(button_.id));
 });
+
+
+const NotesButton = document.getElementById('NotesTag');
+const NotesPage = document.getElementById('NotesPage');
+NotesButton.addEventListener('click', (event) => {
+    NotesPage.style.display = (NotesPage.style.display === 'none') ? 'block' : 'none';
+    console.log("Opened Notes");
+
+});
+NotesPage.addEventListener('click', function() {
+    NotesPage.style.display = "none"
+    console.log("Closed Notes");
+});
+NotesPage.style.display = "none"
 
 
 async function MainMenuButtonClicked(buttonid_){
@@ -545,3 +560,16 @@ async function ConfirmToStartGame(playerisWhite){
     StartGame(playerisWhite);
 
 }
+
+
+// JavaScript to adjust scroll speed
+let scrollSpeed = 0.3;  // Adjust this value to control scroll speed
+
+window.addEventListener('wheel', function(e) {
+    if (e.deltaY !== 0) {
+        window.scrollBy({
+            top: e.deltaY * scrollSpeed,
+            behavior: 'smooth'
+        });
+    }
+}, { passive: true });

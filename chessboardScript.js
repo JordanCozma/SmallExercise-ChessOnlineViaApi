@@ -63,6 +63,22 @@ let turnturn_Text = document.getElementById("TeamNote");
 
 
 
+const NotesButton = document.getElementById('NotesTag');
+const NotesPage = document.getElementById('NotesPage');
+NotesButton.addEventListener('click', (event) => {
+    NotesPage.style.display = (NotesPage.style.display === 'none') ? 'block' : 'none';
+    console.log("Opened Notes");
+
+});
+NotesPage.addEventListener('click', function() {
+    NotesPage.style.display = "none"
+    console.log("Closed Notes");
+});
+NotesPage.style.display = "none"
+
+
+
+
 
 //!  ------ ChessPage ------
 let gridsize__ = [8, 8];     //grid visually can adapt to any size          -- max 13?
