@@ -63,7 +63,7 @@ let turnturn_Text = document.getElementById("TeamNote");
 
 
 
-const NotesButton = document.getElementById('NotesTag');
+const NotesButton = document.getElementById('NotesTag2');
 const NotesPage = document.getElementById('NotesPage');
 NotesButton.addEventListener('click', (event) => {
     NotesPage.style.display = (NotesPage.style.display === 'none') ? 'block' : 'none';

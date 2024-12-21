@@ -182,7 +182,7 @@ input{
 
 
 
-#NotesTag{
+#NotesTag, #NotesTag2{
     pointer-events:  auto;
 
 
@@ -607,6 +607,12 @@ h4{
 
 
 }
+
+#NotesTag2{
+    background-color: rgba(250, 235, 215, 0.26);
+    color: #00000091;
+}
+
 
 #previous_id{
     user-select: text;           /* Prevent text selection */
