@@ -9,8 +9,12 @@
     -webkit-user-drag: none;     /* Prevent dragging in WebKit browsers */
     -moz-user-select: none;      /* For Firefox */
     -ms-user-select: none;       /* For Internet Explorer */
+    
 }
-
+html, body {
+    margin: 0;
+    padding: 0;
+}
 
 
 
@@ -34,7 +38,7 @@ body{
     /* align-items: center; */
     grid-template-rows: auto 1fr;
 
-    height: 95vh;
+    height: 85vh;
     width: 100vw;
     /* background-color:blanchedalmond; */
 
@@ -536,6 +540,19 @@ h4{
     .Table{
         height: 20vh;
         width: 20vh;
+    }
+}
+
+@media screen and (min-aspect-ratio: 2.3/1) {
+    .Table{
+        height: 70vh;
+        width: 70vh;
+    }
+}
+@media screen and (min-aspect-ratio: 4/1) {
+    .Table{
+        height: 58vh;
+        width: 58vh;
     }
 }
 

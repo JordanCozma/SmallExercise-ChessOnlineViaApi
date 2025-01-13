@@ -9,6 +9,11 @@ CheckSetPreciousId();
 
 const delayChecks = 1400;
 
+function updateVH() {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
+window.addEventListener('resize', updateVH);
+updateVH();
 
 function SetHomePageTo(page_){
     currentPage = page_;
