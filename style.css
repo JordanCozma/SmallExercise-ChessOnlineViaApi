@@ -681,8 +681,9 @@ h4{
 @media (max-height: 360px) {
 
     #SkipButton{
-        right: 1.4em;
-        top: 70vh;
+        right: 2em;
+        top: 60vh;
+        bottom: auto;
     }
 }
 
